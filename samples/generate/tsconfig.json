@@ -1,0 +1,45 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "sourceMap": true,
+    "baseUrl": "",
+    "paths": {
+      "@action*": [
+        "./src/action*",
+        "./src/action"
+      ],
+      "@battles*": [
+        "./src/battles*",
+        "./src/battles"
+      ],
+      "@character*": [
+        "./src/character*",
+        "./src/character"
+      ],
+      "@phases*": [
+        "./src/phases*",
+        "./src/phases"
+      ],
+      "@screen*": [
+        "./src/screen*",
+        "./src/screen"
+      ],
+      "@soul*": [
+        "./src/soul*",
+        "./src/soul"
+      ],
+      "@text*": [
+        "./src/text*",
+        "./src/text"
+      ],
+      "@utils*": [
+        "./src/utils*",
+        "./src/utils"
+      ]
+    }
+  },
+  "include": [
+    "./src/**/*",
+    "./.src/**/*"
+  ]
+}

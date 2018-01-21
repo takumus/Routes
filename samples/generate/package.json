@@ -1,0 +1,27 @@
+{
+  "name": "pixi",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "paths": "node updatePaths.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "gulp": "^4.0.0",
+    "gulp-connect": "*",
+    "gulp-webpack": "*",
+    "ts-loader": "*",
+    "tsconfig-paths-webpack-plugin": "^0.1.1",
+    "typescript": "*"
+  },
+  "dependencies": {
+    "@types/es6-promise": "0.0.33",
+    "@types/pixi.js": "*",
+    "@types/routes": "^1.0.5",
+    "@types/tween": "^1.1.3",
+    "routes": "^1.0.8",
+    "tween": "^1.1.3"
+  }
+}
