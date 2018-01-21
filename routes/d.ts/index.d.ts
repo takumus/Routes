@@ -1,5 +1,5 @@
 import { Circle } from './circle';
-import Line from 'line';
+import { Line } from 'line';
 import { XY, XYR } from 'pos';
 export declare class RouteGenerator {
     static getMinimumRoute(vposB: XYR, vposE: XYR, rB: number, rE: number, res: number): Line;

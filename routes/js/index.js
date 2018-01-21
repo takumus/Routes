@@ -147,7 +147,7 @@ var RouteGenerator = /** @class */ (function () {
         return new Route(c1, c2, c1.tr, c2r, c1dr * c1.d, c2dr * c2.d);
     };
     RouteGenerator.getLine = function (bp, ep, res) {
-        var line = new line_1.default();
+        var line = new line_1.Line();
         var tx = ep.x - bp.x;
         var ty = ep.y - bp.y;
         var r = Math.atan2(ty, tx);
@@ -182,7 +182,7 @@ var Route = /** @class */ (function () {
         this.c2rl = c2rl;
     }
     Route.prototype.generateRoute = function (res, line) {
-        if (line === void 0) { line = new line_1.default(); }
+        if (line === void 0) { line = new line_1.Line(); }
         var c1rres = res / (this.c1.r * 2 * M.PI) * M.D_PI;
         var c2rres = res / (this.c2.r * 2 * M.PI) * M.D_PI;
         var _x = Math.cos(this.c1rb) * this.c1.r + this.c1.x;

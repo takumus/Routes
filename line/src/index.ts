@@ -1,5 +1,6 @@
+export * from './effects';
 import {XY, XYR} from 'pos';
-export default class Line {
+export class Line {
     private array: Array<XY>;
     private prevPositionOffset: XY;
     private prevScaleOffset: XY;
@@ -12,7 +13,6 @@ export default class Line {
         this.prevPositionOffset = new XY();
         this.prevScaleOffset = new XY();
     }
-    //public forEach = this.array.forEach;
     public push(pos: XY) {
         this.array.push(pos);
     }
@@ -22,7 +22,12 @@ export default class Line {
     public pop() {
         return this.array.pop();
     }
-    public forEach = this.array.forEach;
+    public get(index: number) {
+        return this.array[index];
+    }
+    public forEach(callbackfn: (value: XY, index: number, array: XY[]) => void, thisArg?: any) {
+        this.array.forEach(callbackfn, thisArg);
+    }
     public get length() {
         return this.array.length;
     }

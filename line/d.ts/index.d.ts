@@ -1,5 +1,6 @@
+export * from './effects';
 import { XY, XYR } from 'pos';
-export default class Line {
+export declare class Line {
     private array;
     private prevPositionOffset;
     private prevScaleOffset;
@@ -10,7 +11,8 @@ export default class Line {
     push(pos: XY): void;
     shift(): XY;
     pop(): XY;
-    forEach: (callbackfn: (value: XY, index: number, array: XY[]) => void, thisArg?: any) => void;
+    get(index: number): XY;
+    forEach(callbackfn: (value: XY, index: number, array: XY[]) => void, thisArg?: any): void;
     readonly length: number;
     setPositionOffset(pos: XY): void;
     setScaleOffset(scale: XY): void;

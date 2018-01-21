@@ -1,5 +1,5 @@
 import {Circle} from './circle';
-import Line from 'line';
+import {Line} from 'line';
 import * as M from 'matthew';
 import {XY, XYR} from 'pos';
 export class RouteGenerator {

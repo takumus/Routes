@@ -1,3 +1,4 @@
+import * as M from 'matthew';
 export class Circle {
     public x: number;
     public y: number;
@@ -17,6 +18,6 @@ export class Circle {
         this.y = y;
         this.r = r;
         this.d = d;
-        this.tr = tr;
+        this.tr = M.normalize(tr);
     }
 }

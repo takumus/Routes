@@ -1,10 +1,13 @@
 "use strict";
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
 Object.defineProperty(exports, "__esModule", { value: true });
+__export(require("./effects"));
 var pos_1 = require("pos");
 var Line = /** @class */ (function () {
     function Line(data) {
         if (data === void 0) { data = []; }
-        this.forEach = this.array.forEach;
         this.array = [];
         for (var i = 0; i < data.length; i++) {
             var p = data[i];
@@ -13,7 +16,6 @@ var Line = /** @class */ (function () {
         this.prevPositionOffset = new pos_1.XY();
         this.prevScaleOffset = new pos_1.XY();
     }
-    //public forEach = this.array.forEach;
     Line.prototype.push = function (pos) {
         this.array.push(pos);
     };
@@ -22,6 +24,12 @@ var Line = /** @class */ (function () {
     };
     Line.prototype.pop = function () {
         return this.array.pop();
+    };
+    Line.prototype.get = function (index) {
+        return this.array[index];
+    };
+    Line.prototype.forEach = function (callbackfn, thisArg) {
+        this.array.forEach(callbackfn, thisArg);
     };
     Object.defineProperty(Line.prototype, "length", {
         get: function () {
@@ -111,4 +119,4 @@ var Line = /** @class */ (function () {
     };
     return Line;
 }());
-module.exports = Line; module.exports.default = Line; exports.default = Line;
+module.exports.Line = exports.Line = Line;

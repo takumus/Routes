@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var M = require("matthew");
 var Circle = /** @class */ (function () {
     /**
      * Create a point.
@@ -19,7 +20,7 @@ var Circle = /** @class */ (function () {
         this.y = y;
         this.r = r;
         this.d = d;
-        this.tr = tr;
+        this.tr = M.normalize(tr);
     }
     return Circle;
 }());
