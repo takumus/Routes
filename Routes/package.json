@@ -1,6 +1,6 @@
 {
   "name": "routes",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "",
   "main": "./js/index.js",
   "scripts": {
@@ -14,10 +14,8 @@
   "dependencies": {
     "@types/line": "^1.0.5",
     "@types/matthew": "^1.0.1",
-    "@types/pos": "^1.0.3",
     "line": "^1.0.5",
-    "matthew": "^1.0.1",
-    "pos": "^1.0.3"
+    "matthew": "^1.0.1"
   },
   "devDependencies": {
     "gulp": "^3.9.1",
