@@ -1,0 +1,5 @@
+{
+  "version": "1.0.1",
+  "name": "@types/matthew",
+  "types:": "./index.d.ts"
+}

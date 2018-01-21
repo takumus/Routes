@@ -1,0 +1,32 @@
+{
+  "name": "routes",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./js/index.js",
+  "scripts": {
+    "push": "npm run updateVersion && npm run pushjs && npm run pushdts",
+    "updateVersion": "node updateVersion.js",
+    "pushjs": "npm publish --registry http://npm.takumus.com",
+    "pushdts": "cd d.ts && npm publish --registry http://npm.takumus.com"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/line": "^1.0.5",
+    "@types/matthew": "^1.0.1",
+    "@types/pos": "^1.0.3",
+    "line": "^1.0.5",
+    "matthew": "^1.0.1",
+    "pos": "^1.0.3"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-add-module-exports": "^1.0.9",
+    "gulp-typescript": "^3.2.3",
+    "merge2": "^1.2.0",
+    "through2": "^2.0.3",
+    "ts-loader": "^3.1.1",
+    "typescript": "^2.6.1",
+    "vinyl-source-stream": "^1.1.0"
+  }
+}

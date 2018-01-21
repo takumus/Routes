@@ -1,0 +1,5 @@
+{
+  "version": "5.0.3",
+  "name": "@types/color",
+  "types:": "./index.d.ts"
+}

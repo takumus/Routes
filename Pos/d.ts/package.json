@@ -1,0 +1,5 @@
+{
+  "version": "1.0.3",
+  "name": "@types/pos",
+  "types:": "./index.d.ts"
+}
