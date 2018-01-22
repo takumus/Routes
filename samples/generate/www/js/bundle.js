@@ -150,22 +150,37 @@
 	        return _this;
 	    }
 	    Main.prototype.init = function () {
+	        this.prevMouse = new pos_1.XY(0, 0);
 	    };
 	    Main.prototype.draw = function () {
 	        var _this = this;
 	        this.n++;
 	        this.canvas.clear();
-	        var from = new pos_1.XYR(this.mouse.x, this.mouse.y, this.n / 60);
-	        var to = new pos_1.XYR(this.size.width / 2, this.size.height / 2, 0);
+	        var from = new pos_1.XYR(this.prevMouse.x, this.prevMouse.y, 0);
+	        var to = new pos_1.XYR(this.size.width / 2, this.size.height / 2, this.n / 60);
+	        var vx = this.mouse.x - this.prevMouse.x;
+	        var vy = this.mouse.y - this.prevMouse.y;
+	        if (vx * vx + vy * vy > 1000) {
+	            this.prevMouse.x += vx * 0.1;
+	            this.prevMouse.y += vy * 0.1;
+	            from.x = this.prevMouse.x;
+	            from.y = this.prevMouse.y;
+	        }
+	        var dy = to.y - from.y;
+	        var dx = to.x - from.x;
+	        var radius1 = 80;
+	        var radius2 = 120;
+	        var waveFreq = 0.3;
+	        var waveAmp = 6;
 	        // 強制的にターゲットと逆を向く
-	        to.r = Math.atan2(to.y - from.y, to.x - from.x);
+	        from.r = Math.atan2(vy, vx);
 	        // 全ルート取得
-	        routes_1.RouteGenerator.getAllRoute(from, to, 80, 70).forEach(function (r, n) {
+	        routes_1.RouteGenerator.getAllRoute(from, to, radius1, radius2).forEach(function (r, n) {
 	            // ルート灰色で描画
 	            _this.canvas.lineStyle(2, 0xffffff - 0x333333 * n, 0.5);
 	            n *= 3;
 	            // sin波エフェクトをかける
-	            line_1.effects.sinWave(r.generateRoute(10), 10, 0.3).forEach(function (p, i) {
+	            line_1.effects.sinWave(r.generateRoute(10), waveAmp, waveFreq).forEach(function (p, i) {
 	                if (i == 0) {
 	                    _this.canvas.moveTo(p.x + n, p.y + n);
 	                }
@@ -176,7 +191,7 @@
 	        });
 	        // 最短ルートを計算 & 赤で描画
 	        this.canvas.lineStyle(3, 0xff0000, 0.9);
-	        line_1.effects.sinWave(routes_1.RouteGenerator.getMinimumRoute(from, to, 80, 70, 10), 10, 0.3).forEach(function (p, i) {
+	        line_1.effects.sinWave(routes_1.RouteGenerator.getMinimumRoute(from, to, radius1, radius2, 10), waveAmp, waveFreq).forEach(function (p, i) {
 	            if (i == 0) {
 	                _this.canvas.moveTo(p.x, p.y);
 	            }

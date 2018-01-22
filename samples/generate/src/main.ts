@@ -4,30 +4,45 @@ import {RouteGenerator as G} from 'routes';
 import {effects} from 'line';
 export default class Main extends Canvas {
     private n = 0;
+    private prevMouse: XY;
     public init() {
-        
+        this.prevMouse = new XY(0, 0);
     }
     public draw() {
         this.n ++;
         this.canvas.clear();
         const from = new XYR(
-            this.mouse.x,
-            this.mouse.y,
-            this.n / 60
+            this.prevMouse.x,
+            this.prevMouse.y,
+            0
         );
         const to = new XYR(
             this.size.width / 2,
             this.size.height / 2,
-            0
+            this.n / 60
         );
+        const vx = this.mouse.x - this.prevMouse.x;
+        const vy = this.mouse.y - this.prevMouse.y;
+        if (vx * vx + vy * vy > 1000) {
+            this.prevMouse.x += vx * 0.1;
+            this.prevMouse.y += vy * 0.1;
+            from.x = this.prevMouse.x;
+            from.y = this.prevMouse.y;
+        }
+        const dy = to.y - from.y;
+        const dx = to.x - from.x;
+        const radius1 = 80;
+        const radius2 = 120;
+        const waveFreq = 0.3;
+        const waveAmp = 6;
         // 強制的にターゲットと逆を向く
-        to.r = Math.atan2(to.y - from.y, to.x - from.x);
+        from.r = Math.atan2(vy, vx);
         // 全ルート取得
         G.getAllRoute(
             from,
             to,
-            80,
-            70
+            radius1,
+            radius2
         ).forEach((r, n) => {
             // ルート灰色で描画
             this.canvas.lineStyle(2, 0xffffff - 0x333333 * n, 0.5);
@@ -35,8 +50,8 @@ export default class Main extends Canvas {
             // sin波エフェクトをかける
             effects.sinWave(
                 r.generateRoute(10),
-                10,
-                0.3
+                waveAmp,
+                waveFreq
             ).forEach((p, i) => {
                 if (i == 0) {
                     this.canvas.moveTo(p.x + n, p.y + n);
@@ -51,12 +66,12 @@ export default class Main extends Canvas {
             G.getMinimumRoute(
                 from,
                 to,
-                80,
-                70,
+                radius1,
+                radius2,
                 10
             ),
-            10,
-            0.3
+            waveAmp,
+            waveFreq
         ).forEach((p, i) => {
             if (i == 0) {
                 this.canvas.moveTo(p.x, p.y);
