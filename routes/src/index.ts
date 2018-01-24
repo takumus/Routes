@@ -3,8 +3,8 @@ import {Line} from 'line';
 import * as M from 'matthew';
 import {XY, XYR} from 'pos';
 export class RouteGenerator {
-    public static getMinimumRoute(vposB: XYR, vposE: XYR, rB: number, rE: number, res: number): Line {
-        const routes = this.getAllRoute(vposB, vposE, rB, rE);
+    public static getMinimumRoute(vposB: XYR, vposE: XYR, rB: number, rE: number, res: number, debug: boolean = false): Line {
+        const routes = this.getAllRoute(vposB, vposE, rB, rE, debug);
         let min = Number.MAX_VALUE;
         let route: Route;
         for (let i = 0; i < routes.length; i ++) {
@@ -16,7 +16,7 @@ export class RouteGenerator {
         };
         return route.generateRoute(res);
     }
-    public static getAllRoute(vposB: XYR, vposE: XYR, rB: number, rE: number): Array<Route> {
+    public static getAllRoute(vposB: XYR, vposE: XYR, rB: number, rE: number, debug: boolean = false): Array<Route> {
         const cB1 = new Circle(
             Math.cos(vposB.r + M.H_PI) * rB + vposB.x,
             Math.sin(vposB.r + M.H_PI) * rB + vposB.y,
@@ -47,17 +47,18 @@ export class RouteGenerator {
         );
         const allRoute: Array<Route> = [];
         let route: Route;
-        route = this.getRoute(cB1, cE1);
+        route = this.getRoute(cB1, cE1, debug);
         if (route) allRoute.push(route);
-        route = this.getRoute(cB1, cE2);
+        route = this.getRoute(cB1, cE2, debug);
         if (route) allRoute.push(route);
-        route = this.getRoute(cB2, cE1);
+        route = this.getRoute(cB2, cE1, debug);
         if (route) allRoute.push(route);
-        route = this.getRoute(cB2, cE2);
+        route = this.getRoute(cB2, cE2, debug);
         if (route) allRoute.push(route);
         return allRoute;
     }
-    private static getRoute(c1: Circle, c2: Circle): Route {
+    private static getRoute(c1: Circle, c2: Circle, _debug: boolean): Route {
+        const debug: Debug = _debug ? new Debug() : null;
         const dx = c2.x - c1.x;
         const dy = c2.y - c1.y;
         const l = dx * dx + dy * dy;
@@ -69,8 +70,8 @@ export class RouteGenerator {
         let c2r: number;
         let c1dr: number;
         let c2dr: number;
-        this.circle(c1.x + Math.cos(c1tr) * c1.r, c1.y + Math.sin(c1tr) * c1.r, 3);
-        this.circle(c2.x + Math.cos(c2tr) * c2.r, c2.y + Math.sin(c2tr) * c2.r, 3);
+        //this.circle(c1.x + Math.cos(c1tr) * c1.r, c1.y + Math.sin(c1tr) * c1.r, 3);
+        //this.circle(c2.x + Math.cos(c2tr) * c2.r, c2.y + Math.sin(c2tr) * c2.r, 3);
         if (c1.d == c2.d) {
             let d = l - (c2.r - c1.r) * (c2.r - c1.r);
             if (d < 0) return null;
@@ -86,23 +87,17 @@ export class RouteGenerator {
             const r = Math.atan2(a1.y - c1.y, a1.x - c1.x) - br;
             if (c1.d > 0) {
                 c2r = c1r = M.normalize(r + br);
-                this.line(a1.x, a1.y, b1.x, b1.y);
+                if (debug){
+                    debug.p1 = a1;
+                    debug.p2 = b1;
+                }
             } else {
                 c2r = c1r = M.normalize(-r + br);
-                this.line(a2.x, a2.y, b2.x, b2.y);
+                if (debug){
+                    debug.p1 = a2;
+                    debug.p2 = b2;
+                }
             }
-            this.line(
-                c1.x,
-                c1.y,
-                Math.cos(c1r) * c1.r + c1.x,
-                Math.sin(c1r) * c1.r + c1.y
-            );
-            this.line(
-                c2.x,
-                c2.y,
-                Math.cos(c2r) * c2.r + c2.x,
-                Math.sin(c2r) * c2.r + c2.y
-            );
         } else if (c1.d != c2.d) {
             let d = l - (c2.r + c1.r) * (c2.r + c1.r);
             if (d < 0) return null;
@@ -119,24 +114,18 @@ export class RouteGenerator {
             if (c1.d > 0) {
                 c1r = M.normalize(r + br);
                 c2r = M.normalize(r + br + M.PI);
-                this.line(a1.x, a1.y, b1.x, b1.y);
+                if (debug){
+                    debug.p1 = a1;
+                    debug.p2 = b1;
+                }
             } else {
                 c1r = M.normalize(-r + br);
                 c2r = M.normalize(-r + br + M.PI);
-                this.line(a2.x, a2.y, b2.x, b2.y);
+                if (debug){
+                    debug.p1 = a2;
+                    debug.p2 = b2;
+                }
             }
-            this.line(
-                c1.x,
-                c1.y,
-                Math.cos(c1r) * c1.r + c1.x,
-                Math.sin(c1r) * c1.r + c1.y
-            );
-            this.line(
-                c2.x,
-                c2.y,
-                Math.cos(c2r) * c2.r + c2.x,
-                Math.sin(c2r) * c2.r + c2.y
-            );
         }
         if (c1.d > 0) {
             if (c1.tr < c1r) {
@@ -164,11 +153,11 @@ export class RouteGenerator {
                 c2dr = c2r - c2.tr;
             }
         }
-        this.circle(c1.x, c1.y, 2);
-        this.circle(c2.x, c2.y, 2);
-        this.circle(c1.x, c1.y, c1.r);
-        this.circle(c2.x, c2.y, c2.r);
-        return new Route(c1, c2, c1.tr, c2r, c1dr * c1.d, c2dr * c2.d);
+        if (debug){
+            debug.circle1 = c1;
+            debug.circle2 = c2;
+        }
+        return new Route(c1, c2, c1.tr, c2r, c1dr * c1.d, c2dr * c2.d, debug);
     }
     public static getLine(bp: XY, ep: XY, res: number): Line {
         const line: Line = new Line();
@@ -187,14 +176,17 @@ export class RouteGenerator {
         }
         return line;
     }
-    private static line(x1: number, y1: number, x2: number, y2: number) {
-        // if(!this.graphics) return;
-        // this.graphics.moveTo(x1, y1);
-        // this.graphics.lineTo(x2, y2);
-    }
-    private static circle(x: number, y: number, r: number) {
-        // if(!this.graphics) return;
-        // this.graphics.drawCircle(x, y, r);
+}
+export class Debug {
+    public circle1: Circle;
+    public circle2: Circle;
+    public p1: XY;
+    public p2: XY;
+    constructor() {
+        this.circle1 = new Circle();
+        this.circle2 = new Circle();
+        this.p1 = new XY();
+        this.p2 = new XY();
     }
 }
 export class Route {
@@ -204,13 +196,15 @@ export class Route {
     public c2rb: number;
     public c1rl: number;
     public c2rl: number;
-    constructor(c1: Circle, c2: Circle, c1rb: number, c2rb: number, c1rl: number, c2rl: number) {
+    public debug: Debug;
+    constructor(c1: Circle, c2: Circle, c1rb: number, c2rb: number, c1rl: number, c2rl: number, debug: Debug = null) {
         this.c1 = c1;
         this.c2 = c2;
         this.c1rb = c1rb;
         this.c2rb = c2rb;
         this.c1rl = c1rl;
         this.c2rl = c2rl;
+        this.debug = debug;
     }
     public generateRoute(res: number, line: Line = new Line()): Line {
         const c1rres = res / (this.c1.r * 2 * M.PI) * M.D_PI;
