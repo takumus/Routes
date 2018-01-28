@@ -6,4 +6,5 @@ export declare class XY {
     equals(pos: XY, diff?: number): boolean;
     round(n: number): void;
     distance(pos: XY): number;
+    copyTo(pos: XY): void;
 }

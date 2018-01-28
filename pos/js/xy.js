@@ -28,6 +28,10 @@ var XY = /** @class */ (function () {
         var ty = pos.y - this.y;
         return Math.sqrt(tx * tx + ty * ty);
     };
+    XY.prototype.copyTo = function (pos) {
+        pos.x = this.x;
+        pos.y = this.y;
+    };
     return XY;
 }());
 module.exports.XY = exports.XY = XY;

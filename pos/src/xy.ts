@@ -23,4 +23,8 @@ export class XY {
         const ty = pos.y - this.y;
         return Math.sqrt(tx * tx + ty * ty);
     }
+    public copyTo(pos: XY) {
+        pos.x = this.x;
+        pos.y = this.y;
+    }
 }

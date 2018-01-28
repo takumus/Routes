@@ -147,6 +147,14 @@
 	    function Main() {
 	        var _this = _super !== null && _super.apply(this, arguments) || this;
 	        _this.n = 0;
+	        _this.lFromPos = _this.createLabel("P1", 0x000000, 24);
+	        _this.lToPos = _this.createLabel("P2", 0x000000, 24);
+	        _this.colors = [
+	            0xff0000,
+	            0x00ff00,
+	            0x0000ff,
+	            0x00ffff
+	        ];
 	        return _this;
 	    }
 	    Main.prototype.init = function () {
@@ -156,11 +164,18 @@
 	        var _this = this;
 	        this.n++;
 	        this.canvas.clear();
+	        this.canvas.beginFill(0xFFFFFF);
+	        this.canvas.drawRect(0, 0, this.size.width, this.size.height);
+	        this.canvas.endFill();
 	        var from = new pos_1.XYR(this.prevMouse.x, this.prevMouse.y, 0);
-	        var to = new pos_1.XYR(this.size.width / 2, this.size.height / 2, this.n / 60);
+	        var to = new pos_1.XYR(this.size.width / 2, this.size.height / 2, -this.n / 90);
+	        this.lToPos.x = to.x - 40;
+	        this.lToPos.y = to.y - 40;
+	        this.lFromPos.x = from.x - 40;
+	        this.lFromPos.y = from.y - 40;
 	        var vx = this.mouse.x - this.prevMouse.x;
 	        var vy = this.mouse.y - this.prevMouse.y;
-	        if (vx * vx + vy * vy > 1000) {
+	        if (vx * vx + vy * vy > 3600) {
 	            this.prevMouse.x += vx * 0.1;
 	            this.prevMouse.y += vy * 0.1;
 	            from.x = this.prevMouse.x;
@@ -169,50 +184,61 @@
 	        var dy = to.y - from.y;
 	        var dx = to.x - from.x;
 	        var radius1 = 80;
-	        var radius2 = 120;
+	        var radius2 = 80;
 	        var waveFreq = 0.3;
 	        var waveAmp = 6;
 	        // 強制的にターゲットと逆を向く
 	        from.r = Math.atan2(vy, vx);
 	        // 全ルート取得
-	        routes_1.RouteGenerator.getAllRoute(from, to, radius1, radius2).forEach(function (r, n) {
-	            // ルート灰色で描画
-	            _this.canvas.lineStyle(2, 0xffffff - 0x333333 * n, 0.5);
-	            n *= 3;
-	            // sin波エフェクトをかける
-	            line_1.effects.sinWave(r.generateRoute(10), waveAmp, waveFreq).forEach(function (p, i) {
-	                if (i == 0) {
-	                    _this.canvas.moveTo(p.x + n, p.y + n);
-	                }
-	                else {
-	                    _this.canvas.lineTo(p.x + n, p.y + n);
-	                }
-	            });
+	        var routes1 = routes_1.RouteGenerator.getAllRoute(from, to, radius1, radius2, true);
+	        var line;
+	        routes1 = routes1.sort(function (a, b) { return a.getLength() - b.getLength(); });
+	        routes1.forEach(function (r, n) {
+	            //if (n != 0) return;
+	            if (n == 0) {
+	                line = line_1.effects.sinWave(r.generateRoute(10), waveAmp, waveFreq);
+	            }
+	            _this.canvas.lineStyle(2, 0xEEEEEE, 1);
+	            _this.canvas.drawCircle(r.debug.circle1.x, r.debug.circle1.y, r.debug.circle1.r);
+	            _this.canvas.drawCircle(r.debug.circle2.x, r.debug.circle2.y, r.debug.circle2.r);
+	            _this.canvas.moveTo(r.debug.p1.x, r.debug.p1.y);
+	            _this.canvas.lineTo(r.debug.p2.x, r.debug.p2.y);
 	        });
-	        // 最短ルートを計算 & 赤で描画
-	        this.canvas.lineStyle(3, 0xff0000, 0.9);
-	        line_1.effects.sinWave(routes_1.RouteGenerator.getMinimumRoute(from, to, radius1, radius2, 10), waveAmp, waveFreq).forEach(function (p, i) {
+	        this.renderLine(line, 0xff0000, 3, 0.5, 0);
+	        // 目印
+	        this.drawMarker(from);
+	        this.drawMarker(to);
+	    };
+	    Main.prototype.renderLine = function (route, color, thickness, alpha, offset) {
+	        var _this = this;
+	        this.canvas.endFill();
+	        this.canvas.lineStyle(thickness, color, alpha);
+	        route.forEach(function (p, i) {
 	            if (i == 0) {
-	                _this.canvas.moveTo(p.x, p.y);
+	                _this.canvas.moveTo(p.x + offset, p.y + offset);
 	            }
 	            else {
-	                _this.canvas.lineTo(p.x, p.y);
+	                _this.canvas.lineTo(p.x + offset, p.y + offset);
 	            }
 	        });
-	        // 目印
-	        var ll = 30;
+	    };
+	    Main.prototype.createLabel = function (text, color, size) {
+	        var label = new PIXI.Text(text, {
+	            fill: color,
+	            fontSize: size
+	        });
+	        this.addChild(label);
+	        return label;
+	    };
+	    Main.prototype.drawMarker = function (xyr, l) {
+	        if (l === void 0) { l = 60; }
 	        this.canvas.lineStyle();
-	        this.canvas.beginFill(0xffff00);
-	        this.canvas.drawCircle(from.x, from.y, 4);
-	        this.canvas.beginFill(0x00ffff);
-	        this.canvas.drawCircle(to.x, to.y, 4);
+	        this.canvas.beginFill(0x666666);
+	        this.canvas.drawCircle(xyr.x, xyr.y, 12);
 	        this.canvas.endFill();
-	        this.canvas.lineStyle(3, 0xffff00);
-	        this.canvas.moveTo(from.x, from.y);
-	        this.canvas.lineTo(Math.cos(from.r) * ll + from.x, Math.sin(from.r) * ll + from.y);
-	        this.canvas.lineStyle(3, 0x00ffff);
-	        this.canvas.moveTo(to.x, to.y);
-	        this.canvas.lineTo(Math.cos(to.r) * ll + to.x, Math.sin(to.r) * ll + to.y);
+	        this.canvas.lineStyle(3, 0x666666);
+	        this.canvas.moveTo(xyr.x, xyr.y);
+	        this.canvas.lineTo(Math.cos(xyr.r) * l + xyr.x, Math.sin(xyr.r) * l + xyr.y);
 	    };
 	    return Main;
 	}(canvas_1.default));
@@ -355,8 +381,9 @@
 	var RouteGenerator = /** @class */ (function () {
 	    function RouteGenerator() {
 	    }
-	    RouteGenerator.getMinimumRoute = function (vposB, vposE, rB, rE, res) {
-	        var routes = this.getAllRoute(vposB, vposE, rB, rE);
+	    RouteGenerator.getMinimumRoute = function (vposB, vposE, rB, rE, res, debug) {
+	        if (debug === void 0) { debug = false; }
+	        var routes = this.getAllRoute(vposB, vposE, rB, rE, debug);
 	        var min = Number.MAX_VALUE;
 	        var route;
 	        for (var i = 0; i < routes.length; i++) {
@@ -369,28 +396,30 @@
 	        ;
 	        return route.generateRoute(res);
 	    };
-	    RouteGenerator.getAllRoute = function (vposB, vposE, rB, rE) {
+	    RouteGenerator.getAllRoute = function (vposB, vposE, rB, rE, debug) {
+	        if (debug === void 0) { debug = false; }
 	        var cB1 = new circle_1.Circle(Math.cos(vposB.r + M.H_PI) * rB + vposB.x, Math.sin(vposB.r + M.H_PI) * rB + vposB.y, rB, 1, vposB.r - M.H_PI);
 	        var cB2 = new circle_1.Circle(Math.cos(vposB.r - M.H_PI) * rB + vposB.x, Math.sin(vposB.r - M.H_PI) * rB + vposB.y, rB, -1, vposB.r + M.H_PI);
 	        var cE1 = new circle_1.Circle(Math.cos(vposE.r + M.H_PI) * rE + vposE.x, Math.sin(vposE.r + M.H_PI) * rE + vposE.y, rE, 1, vposE.r - M.H_PI);
 	        var cE2 = new circle_1.Circle(Math.cos(vposE.r - M.H_PI) * rE + vposE.x, Math.sin(vposE.r - M.H_PI) * rE + vposE.y, rE, -1, vposE.r + M.H_PI);
 	        var allRoute = [];
 	        var route;
-	        route = this.getRoute(cB1, cE1);
+	        route = this.getRoute(cB1, cE1, debug);
 	        if (route)
 	            allRoute.push(route);
-	        route = this.getRoute(cB1, cE2);
+	        route = this.getRoute(cB1, cE2, debug);
 	        if (route)
 	            allRoute.push(route);
-	        route = this.getRoute(cB2, cE1);
+	        route = this.getRoute(cB2, cE1, debug);
 	        if (route)
 	            allRoute.push(route);
-	        route = this.getRoute(cB2, cE2);
+	        route = this.getRoute(cB2, cE2, debug);
 	        if (route)
 	            allRoute.push(route);
 	        return allRoute;
 	    };
-	    RouteGenerator.getRoute = function (c1, c2) {
+	    RouteGenerator.getRoute = function (c1, c2, _debug) {
+	        var debug = _debug ? new Debug() : null;
 	        var dx = c2.x - c1.x;
 	        var dy = c2.y - c1.y;
 	        var l = dx * dx + dy * dy;
@@ -402,8 +431,8 @@
 	        var c2r;
 	        var c1dr;
 	        var c2dr;
-	        this.circle(c1.x + Math.cos(c1tr) * c1.r, c1.y + Math.sin(c1tr) * c1.r, 3);
-	        this.circle(c2.x + Math.cos(c2tr) * c2.r, c2.y + Math.sin(c2tr) * c2.r, 3);
+	        //this.circle(c1.x + Math.cos(c1tr) * c1.r, c1.y + Math.sin(c1tr) * c1.r, 3);
+	        //this.circle(c2.x + Math.cos(c2tr) * c2.r, c2.y + Math.sin(c2tr) * c2.r, 3);
 	        if (c1.d == c2.d) {
 	            var d = l - (c2.r - c1.r) * (c2.r - c1.r);
 	            if (d < 0)
@@ -420,14 +449,18 @@
 	            var r = Math.atan2(a1.y - c1.y, a1.x - c1.x) - br;
 	            if (c1.d > 0) {
 	                c2r = c1r = M.normalize(r + br);
-	                this.line(a1.x, a1.y, b1.x, b1.y);
+	                if (debug) {
+	                    debug.p1 = a1;
+	                    debug.p2 = b1;
+	                }
 	            }
 	            else {
 	                c2r = c1r = M.normalize(-r + br);
-	                this.line(a2.x, a2.y, b2.x, b2.y);
+	                if (debug) {
+	                    debug.p1 = a2;
+	                    debug.p2 = b2;
+	                }
 	            }
-	            this.line(c1.x, c1.y, Math.cos(c1r) * c1.r + c1.x, Math.sin(c1r) * c1.r + c1.y);
-	            this.line(c2.x, c2.y, Math.cos(c2r) * c2.r + c2.x, Math.sin(c2r) * c2.r + c2.y);
 	        }
 	        else if (c1.d != c2.d) {
 	            var d = l - (c2.r + c1.r) * (c2.r + c1.r);
@@ -446,15 +479,19 @@
 	            if (c1.d > 0) {
 	                c1r = M.normalize(r + br);
 	                c2r = M.normalize(r + br + M.PI);
-	                this.line(a1.x, a1.y, b1.x, b1.y);
+	                if (debug) {
+	                    debug.p1 = a1;
+	                    debug.p2 = b1;
+	                }
 	            }
 	            else {
 	                c1r = M.normalize(-r + br);
 	                c2r = M.normalize(-r + br + M.PI);
-	                this.line(a2.x, a2.y, b2.x, b2.y);
+	                if (debug) {
+	                    debug.p1 = a2;
+	                    debug.p2 = b2;
+	                }
 	            }
-	            this.line(c1.x, c1.y, Math.cos(c1r) * c1.r + c1.x, Math.sin(c1r) * c1.r + c1.y);
-	            this.line(c2.x, c2.y, Math.cos(c2r) * c2.r + c2.x, Math.sin(c2r) * c2.r + c2.y);
 	        }
 	        if (c1.d > 0) {
 	            if (c1.tr < c1r) {
@@ -488,11 +525,11 @@
 	                c2dr = c2r - c2.tr;
 	            }
 	        }
-	        this.circle(c1.x, c1.y, 2);
-	        this.circle(c2.x, c2.y, 2);
-	        this.circle(c1.x, c1.y, c1.r);
-	        this.circle(c2.x, c2.y, c2.r);
-	        return new Route(c1, c2, c1.tr, c2r, c1dr * c1.d, c2dr * c2.d);
+	        if (debug) {
+	            debug.circle1 = c1;
+	            debug.circle2 = c2;
+	        }
+	        return new Route(c1, c2, c1.tr, c2r, c1dr * c1.d, c2dr * c2.d, debug);
 	    };
 	    RouteGenerator.getLine = function (bp, ep, res) {
 	        var line = new line_1.Line();
@@ -508,26 +545,29 @@
 	        }
 	        return line;
 	    };
-	    RouteGenerator.line = function (x1, y1, x2, y2) {
-	        // if(!this.graphics) return;
-	        // this.graphics.moveTo(x1, y1);
-	        // this.graphics.lineTo(x2, y2);
-	    };
-	    RouteGenerator.circle = function (x, y, r) {
-	        // if(!this.graphics) return;
-	        // this.graphics.drawCircle(x, y, r);
-	    };
 	    return RouteGenerator;
 	}());
 	module.exports.RouteGenerator = exports.RouteGenerator = RouteGenerator;
+	var Debug = /** @class */ (function () {
+	    function Debug() {
+	        this.circle1 = new circle_1.Circle();
+	        this.circle2 = new circle_1.Circle();
+	        this.p1 = new pos_1.XY();
+	        this.p2 = new pos_1.XY();
+	    }
+	    return Debug;
+	}());
+	module.exports.Debug = exports.Debug = Debug;
 	var Route = /** @class */ (function () {
-	    function Route(c1, c2, c1rb, c2rb, c1rl, c2rl) {
+	    function Route(c1, c2, c1rb, c2rb, c1rl, c2rl, debug) {
+	        if (debug === void 0) { debug = null; }
 	        this.c1 = c1;
 	        this.c2 = c2;
 	        this.c1rb = c1rb;
 	        this.c2rb = c2rb;
 	        this.c1rl = c1rl;
 	        this.c2rl = c2rl;
+	        this.debug = debug;
 	    }
 	    Route.prototype.generateRoute = function (res, line) {
 	        if (line === void 0) { line = new line_1.Line(); }
