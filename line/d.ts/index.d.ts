@@ -25,4 +25,5 @@ export declare class Line {
     toString(): string;
     private _getVecPos(fp, sp);
     getVecPos(id: number): XYR;
+    getPosByPercent(p: number): XY;
 }

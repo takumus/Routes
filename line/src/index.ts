@@ -53,7 +53,7 @@ export class Line {
         let minY = Number.MAX_VALUE;
         let maxY = Number.MIN_VALUE;
         for (let i = 0; i < this.length; i ++) {
-            const p = this[i];
+            const p = this.get(i);
             if (minX > p.x) minX = p.x;
             else if (maxX < p.x) maxX = p.x;
             if (minY > p.y) minY = p.y;
@@ -63,20 +63,20 @@ export class Line {
     }
     public getHeadVecPos(): XYR {
         return this._getVecPos(
-            this[0],
-            this[1]
+            this.get(0),
+            this.get(1)
         );
     }
     public getTailVecPos(): XYR {
         return this._getVecPos(
-            this[this.length - 1],
-            this[this.length - 2]
+            this.get(this.length - 1),
+            this.get(this.length - 2)
         );
     }
     public pushLine(line: Line): Line {
         if (line.length < 1) return this;
         line = line.clone();
-        if (this.length > 0 && line[0].equals(this[this.length - 1])) line.shift();
+        if (this.length > 0 && line.get(0).equals(this.get(this.length - 1))) line.shift();
         line.forEach((p) => {
             this.push(p.clone());
         })
@@ -106,12 +106,27 @@ export class Line {
         );
     }
     public getVecPos(id: number): XYR {
-        let p1 = this[id];
-        let p2 = this[id + 1];
+        let p1 = this.get(id);
+        let p2 = this.get(id + 1);
         if (!p2) {
-            p1 = this[id - 1];
-            p2 = this[id];
+            p1 = this.get(id - 1);
+            p2 = this.get(id);
         }
         return this._getVecPos(p1, p2);
+    }
+    public getPosByPercent(p: number) {
+        p = p < 0 ? 0 : p > 1 ? 1 : p;
+        const index = Math.floor(p * (this.length - 1));
+        const pos = this.get(index).clone();
+        const l = 1 / (this.length - 1);
+        const per = (p - l * index) / l;
+        if (per > 0) {
+            const nPos = this.get(index + 1);
+            const dx = (nPos.x - pos.x) * per;
+            const dy = (nPos.y - pos.y) * per;
+            pos.x += dx;
+            pos.y += dy;
+        }
+        return pos;
     }
 }

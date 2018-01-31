@@ -62,7 +62,7 @@ var Line = /** @class */ (function () {
         var minY = Number.MAX_VALUE;
         var maxY = Number.MIN_VALUE;
         for (var i = 0; i < this.length; i++) {
-            var p = this[i];
+            var p = this.get(i);
             if (minX > p.x)
                 minX = p.x;
             else if (maxX < p.x)
@@ -75,17 +75,17 @@ var Line = /** @class */ (function () {
         return new pos_1.XY(maxX - minX, maxY - minY);
     };
     Line.prototype.getHeadVecPos = function () {
-        return this._getVecPos(this[0], this[1]);
+        return this._getVecPos(this.get(0), this.get(1));
     };
     Line.prototype.getTailVecPos = function () {
-        return this._getVecPos(this[this.length - 1], this[this.length - 2]);
+        return this._getVecPos(this.get(this.length - 1), this.get(this.length - 2));
     };
     Line.prototype.pushLine = function (line) {
         var _this = this;
         if (line.length < 1)
             return this;
         line = line.clone();
-        if (this.length > 0 && line[0].equals(this[this.length - 1]))
+        if (this.length > 0 && line.get(0).equals(this.get(this.length - 1)))
             line.shift();
         line.forEach(function (p) {
             _this.push(p.clone());
@@ -109,13 +109,28 @@ var Line = /** @class */ (function () {
         return new pos_1.XYR(fp.x, fp.y, Math.atan2(sp.y - fp.y, sp.x - fp.x));
     };
     Line.prototype.getVecPos = function (id) {
-        var p1 = this[id];
-        var p2 = this[id + 1];
+        var p1 = this.get(id);
+        var p2 = this.get(id + 1);
         if (!p2) {
-            p1 = this[id - 1];
-            p2 = this[id];
+            p1 = this.get(id - 1);
+            p2 = this.get(id);
         }
         return this._getVecPos(p1, p2);
+    };
+    Line.prototype.getPosByPercent = function (p) {
+        p = p < 0 ? 0 : p > 1 ? 1 : p;
+        var index = Math.floor(p * (this.length - 1));
+        var pos = this.get(index).clone();
+        var l = 1 / (this.length - 1);
+        var per = (p - l * index) / l;
+        if (per > 0) {
+            var nPos = this.get(index + 1);
+            var dx = (nPos.x - pos.x) * per;
+            var dy = (nPos.y - pos.y) * per;
+            pos.x += dx;
+            pos.y += dy;
+        }
+        return pos;
     };
     return Line;
 }());
